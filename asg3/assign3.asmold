@@ -1,0 +1,173 @@
+//Name: Ummey Zarin Tashnim
+//ID: 30034931
+//Professor: Leonard Manzara
+//TA: Md. Reza Rabbani
+
+//This progarm was translated from C to asembly
+fmt:	 	.string "v[%d]: %d\n"
+sorted_array:	.string "\nSorted array:\n"
+debug:	 	.string "   j_r = %d \n"
+debug1:	 	.string "j_r-1 = %d \n"
+debug2:	 	.string "v[%d] < v[%d] = %d < %d \n"
+define(i_r, w19)
+define(v_r, w20)
+define(j_r, w21)
+define(temp_r, w22)
+//define(v_r1, w23)
+fp	       .req x29
+lr	       .req x30
+
+		size = 50
+		v_size = size * 4			//50 * 4 = 200
+		i_size = 4				//4 bytes
+		j_size = 4				//4 bytes
+		temp_size = 4				//4 bytes
+		all_sizes = v_size + i_size + j_size + temp_size 
+		
+		vOffset = 16				//vOffset = 16 bytes
+		iOffset = 16 + v_size			//iOffset = 16 + 4 = 20 bytes
+		jOffset = 16 + v_size + i_size		//jOffset = 16 + 16 + 20 = 52 bytes
+	        tempOffset = 16 + v_size + i_size + j_size//tempOffset = 16 + 16 + 20 + 52 = 104 bytes
+	
+		alloc = -(16 + all_sizes) & -16		//calculate of how much memory to allocate 
+		dealloc = -alloc			//deallocate calculation
+	
+		.balign	4
+		.global main
+	
+main: 		stp	fp, lr, [sp, alloc]!		//allocate memory
+		mov	fp, sp
+
+		add	x28, fp, vOffset 		//16 bytes for frame record - base address of the array v
+
+		mov	i_r, 0				//initialize i_r
+		str	i_r, [fp, iOffset]		//set i offset
+		b	loop_test			//branch to loop_test
+
+inside_loop:	ldr	v_r, [fp, vOffset]
+		bl	rand				//branch to random fuction
+		and	v_r, w0, 0xFF			
+		str	v_r, [x28, i_r, SXTW 2]		//v[i] = rand() & 0xFF
+	
+		adrp	x0, fmt				//
+		add	w0, w0, :lo12:fmt		//
+		mov	w1, i_r				//w1 = i_r
+		mov	w2, v_r				//w2 = v[i]
+		bl	printf				//print the unsorted arrays
+
+		ldr	i_r, [fp, iOffset]		//load register i_r
+		add	i_r, i_r, 1			//increment i_r
+		str	i_r, [fp, iOffset]		//store register i_r
+		
+
+loop_test:	ldr	i_r, [fp, iOffset]	
+		cmp	i_r, size			//while i_r < size
+//		str	i_r, [fp, iOffset]
+		b.lt	inside_loop			//go into the 1st loop
+
+//		ldr	i_r, [fp, iOffset]
+		mov	i_r, 1				//i_r = 1
+		str	i_r, [fp, iOffset] 		//store i_r = 1		
+		b	loop2_test			//branch to the 2nd loop
+
+inside_loop2:	//ldr	temp_r, [fp, tempOffset]		//load v_r
+	        ldr	temp_r, [x28, i_r, SXTW 2] 	//v_r = v[i]
+//	        ldr	v_r, [x28, i_r, SXTW 2] 	//v_r = v[i]
+//		mov	temp_r, v_r			//temp_r = v[i]
+//		str	temp_r, [fp, tempOffset]
+
+		adrp	x0, debug1
+		add	w0, w0, :lo12:debug1
+		mov	w1, temp_r
+		bl	printf	
+
+//		ldr	i_r, [fp, iOffset] 		//ADDED
+//		ldr	j_r, [fp, jOffset]		//ADDED
+		mov	j_r, i_r		 	//j = i
+		str	j_r, [fp, jOffset]
+
+		b	loop_inside_loop_test 
+	
+loop_inside_loop:
+//		sub	w26, w26, 1			//w26 = w26-1
+//		ldr	v_r, [x28, w26, SXTW 2]		//v_r = j-1
+//		ldr	j_r, [fp, jOffset]
+		str	v_r, [x28, j_r, SXTW 2]		//v[j]
+		ldr	w26, [x28, w25, SXTW 2]		//
+		mov	v_r, w26
+	
+//		ldr	j_r, [fp, jOffset]
+		sub	j_r, j_r, 1			//decrement j_r
+//	        str	j_r, [fp, jOffset]
+		adrp	x0, debug
+		add	w0, w0, :lo12:debug
+		mov	w1, j_r
+		bl	printf	
+
+loop_inside_loop_test:
+//		ldr	j_r, [fp, jOffset]
+		cmp	j_r, 0				//while j_r > 0 
+//		str	j_r, [fp, jOffset]
+		b.le	next				//go to after end of loop_inside_loop
+
+and_cond:	sub	w25, j_r, 1			//j_r = j-1
+		str	w26, [x28, w25, SXTW 2]
+
+		adrp	x0, debug2
+		add	w0, w0, :lo12:debug2
+		mov	w1, j_r
+		mov	w2, w25
+		mov	w3, v_r
+		mov	w4, w26
+		
+		bl	printf	
+
+
+//		ldr	temp_r, [fp, tempOffset]
+		cmp	temp_r, v_r			//while temp < v[j-1]
+		b.lt	loop_inside_loop		//go into loop_inside_loop
+
+next:		ldr	temp_r, [fp, tempOffset]	
+		mov	v_r, temp_r			//v[j] = temp
+
+		str	v_r, [x28, j_r, SXTW 2]		//ADDED
+
+		ldr	i_r, [fp, iOffset]
+		add	i_r, i_r, 1			//increment i_r
+		str	i_r, [fp, iOffset]
+
+loop2_test:	ldr	i_r, [fp, iOffset]	
+		cmp	i_r, size			//while i_r < size
+		str	i_r, [fp, iOffset]	
+		b.lt	inside_loop2			//go inside loop2
+	
+print_sorted_array:
+		adrp	x0, sorted_array		//
+		add	x0, x0, :lo12:sorted_array	//print "Sorted array: "
+		bl	printf				//
+
+		ldr	i_r, [fp, iOffset]
+		mov	i_r, 0				//i_r = 0
+		str	i_r, [fp, iOffset]
+	
+loop3:		cmp	i_r, size			//while i_r >= size
+		b.ge	done				//branch to done
+		ldr	v_r, [fp, vOffset]
+		str	v_r, [x28, i_r, SXTW 2]		//v_r = v[i]
+
+		adrp	x0, fmt				//
+		add	w0, w0, :lo12:fmt		//
+		mov	w1, i_r				//print the sorted array 
+		mov	w2, v_r				//
+		bl	printf				//
+
+		ldr	i_r, [fp, iOffset]		
+		add	i_r, i_r, 1			//increment i_r
+		str	i_r, [fp, iOffset]		
+
+		b	loop3				//branch back to loop3
+done:	
+		mov 	w0, 0
+		ldp 	fp, lr, [sp], dealloc		//deallocate memory
+		ret	
+

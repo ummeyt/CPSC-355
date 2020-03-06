@@ -1,0 +1,15 @@
+Script started on 2017-12-03 18:48:02-0700
+]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ m4 a5b.asm > a5b.s
+]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ gcc a5b.s -o a5b
+]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ ./a5b
+usage: a5b mm dd
+]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ ./a5b 07 20
+July 20th is 
+ ]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ ./a5b 09 5
+September 5th is 
+ ]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ ./a5b 12 30
+December 30th is 
+ ]0;ummeyzarin.tashnim@csa1:~/asg5ummeyzarin.tashnim@csa1:~/asg5$ exit
+exit
+
+Script done on 2017-12-03 18:49:15-0700
